@@ -117,6 +117,19 @@ Function to get the correct chemical potential given a filling.
     end
 
 
+    function block_matrix(N::Int)
+    #Would need a generalisation in case dimension of matrix is odd. But ok for now,
+    #Assuming fermions dof.
+        iseven(N) || throw(ArgumentError("N must be even"))
+        M = zeros(Int, N, N)
+        h = N ÷ 2
+        for i in 1:h
+            M[i, i] = 1
+            M[h + i, N - i + 1] = 1
+        end
+        return M
+    end
+
 """
 ```julia
 GetGk!(M::BdGModel)
@@ -128,10 +141,13 @@ Finding the Greens functions, and anomalous greens functions in momentum space a
         N       =   length(M.Ham.bands[begin])
         Eks     =   reshape(getindex.(M.Ham.bands, Ref(1:N÷2)) , prod(M.bz.gridSize))   ##### Only the negative energies from the bdG spectrum
 
-        U11s    =   reshape(getindex.(M.Ham.states, Ref(1:N÷2), Ref(1:N÷2)) , prod(M.bz.gridSize))          ##### The 4 different quadrants in the Unitary relating the BdG quasiparticles and the nambu basis
-        U21s    =   reshape(getindex.(M.Ham.states, Ref(N÷2 + 1: N), Ref(1:N÷2)) , prod(M.bz.gridSize))
-        U12s    =   reshape(getindex.(M.Ham.states, Ref(1:N÷2), Ref(N÷2 + 1: N)) , prod(M.bz.gridSize))
-        U22s    =   reshape(getindex.(M.Ham.states, Ref(N÷2 + 1: N), Ref(N÷2 + 1: N)) , prod(M.bz.gridSize))
+temp_states = M.Ham.states .* Ref(block_matrix(size(M.Ham.states[begin])[1]))
+        
+
+        U11s    =   reshape(getindex.(temp_states, Ref(1:N÷2), Ref(1:N÷2)) , prod(M.bz.gridSize))          ##### The 4 different quadrants in the Unitary relating the BdG quasiparticles and the nambu basis
+        U21s    =   reshape(getindex.(temp_states, Ref(N÷2 + 1: N), Ref(1:N÷2)) , prod(M.bz.gridSize))
+        U12s    =   reshape(getindex.(temp_states, Ref(1:N÷2), Ref(N÷2 + 1: N)) , prod(M.bz.gridSize))
+        U22s    =   reshape(getindex.(temp_states, Ref(N÷2 + 1: N), Ref(N÷2 + 1: N)) , prod(M.bz.gridSize))
 
         nFs     =   DistFunction.(Eks; T=M.T, mu=0.0, stat=M.stat)
 
