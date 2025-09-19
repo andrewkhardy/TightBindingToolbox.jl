@@ -83,7 +83,7 @@ Function to get chemical potential for a given `Model`, within a tolerance.
             energies  =   sort(reduce(vcat, M.Ham.bands))
             M.mu      =   (energies[floor(Int64, length(energies)*M.filling)] + energies[floor(Int64, length(energies)*M.filling)+1])/2
         else
-            M.mu      =   BinarySearch(M.filling, M.Ham.bandwidth, FindFilling, (M.Ham.bands, M.T, M.stat) ; initial = guess, x_tol=mu_tol, target_tol = filling_tol)
+            M.mu      =   BinarySearch(M.filling, 10 .* M.Ham.bandwidth, FindFilling, (M.Ham.bands, M.T, M.stat) ; initial = guess, x_tol=mu_tol, target_tol = filling_tol)
             @info "Found chemical potential μ = $(M.mu) for given filling = $(M.filling)."
         end
     end
