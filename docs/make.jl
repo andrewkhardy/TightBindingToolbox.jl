@@ -22,6 +22,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/Anjishnubose/TightBindingToolbox.jl.git",
+    repo = "github.com/andrewkhardy/TightBindingToolbox.jl.git",
     devbranch = "main"
 )
