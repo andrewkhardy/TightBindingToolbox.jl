@@ -2,8 +2,6 @@ using Documenter
 using TightBindingToolbox
 
 makedocs(
-    repo      = "github.com/andrewkhardy/TightBindingToolbox.jl",
-    devbranch = "main",    
     build       =   "build" ,
     sitename    =   "TightBindingToolbox.jl"    ,
     modules     =   [TightBindingToolbox, TightBindingToolbox.UCell, TightBindingToolbox.DesignUCell, TightBindingToolbox.ExpandUCell, TightBindingToolbox.Parameters, TightBindingToolbox.LatticeStruct, TightBindingToolbox.DesignLattice, TightBindingToolbox.BZone, TightBindingToolbox.Hams, TightBindingToolbox.TBModel, TightBindingToolbox.Chern, TightBindingToolbox.suscep, TightBindingToolbox.conduct]   ,
@@ -24,6 +22,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/andrewkhardy/TightBindingToolbox.jl.git",
+    repo = "github.com/andrewkhardy/TightBindingToolbox.jl",
     devbranch = "main"
 )
