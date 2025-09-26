@@ -31,9 +31,9 @@ Currently supported :
     |:--:| 
     |*Density of state of graphene.*|
 * Filling the model at given chemical potential, and calculating gaps. (v1.3) : also supported for BdG systems.
-    |![Alt text](./docs/src/Figures/boxaevChain.png)|
+    |![Alt text](./docs/src/Figures/KitaevChain.png)|
     |:--:| 
-    |*Band structure of the boxaev Chain in 1-d.*|
+    |*Band structure of the Kitaev Chain in 1-d.*|
 * Fermi surfaces of systems
     |![Alt text](./docs/src/Figures/Triangle_123NN_FS.png)|
     |:--:| 
