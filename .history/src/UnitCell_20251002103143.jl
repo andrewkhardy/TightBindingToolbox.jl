@@ -89,8 +89,8 @@ Function to flip a bond. Only works on bonds of rank = 2 right now.
 
 Initialize this structure using 
 ```julia
-UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64)
-UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64, rank::Int64)
+UnitCell( as::Vector{Vector{Float64}} , localDim::Int64)
+UnitCell( as::Vector{Vector{Float64}} , localDim::Int64, rank::Int64)
 ```
 """
 	mutable struct UnitCell{T}
@@ -111,13 +111,13 @@ UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64, rank::Int64)
 		localDim    :: Int64 # Local Hilbert space dimension ( 3 for classical spins, 2 for partons )
 		BC          :: Vector{ ComplexF64 } # Boundary condition
 	
-		function UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64 =2)
+		function UnitCell( as::Vector{Vector{Float64}} , localDim::Int64)
 			#@warn "Bond rank not passed when constructing UnitCell. Choosing default value of 2."
 			@assert length.(as) == repeat([length(as[begin])] , length(as)) "All primitives should have the same dimensions!"
 			return new{2}( as , Vector{Float64}[] , Bond{2}[] , Vector{Float64}[] , Matrix{ComplexF64}[] , localDim , ones(ComplexF64, length(as)) )
 		end
 	
-		function UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64 =2, rank::Int64 =2)
+		function UnitCell( as::Vector{Vector{Float64}} , localDim::Int64, rank::Int64)
 			@assert length.(as) == repeat([length(as[begin])] , length(as)) "All primitives should have the same dimensions!"
 			return new{rank}( as , Vector{Float64}[] , Bond{rank}[] , Vector{Float64}[] , Matrix{ComplexF64}[] , localDim , ones(ComplexF64, length(as)) )
 		end

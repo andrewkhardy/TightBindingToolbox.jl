@@ -20,7 +20,7 @@ module Parameters
 Initialize this structure using 
 ```julia
 Param( value::Float64 )
-Param( value::Float64 ; rank::Int64 )
+Param( value::Float64 , rank::Int64 )
 ```
 
 """

@@ -89,8 +89,8 @@ Function to flip a bond. Only works on bonds of rank = 2 right now.
 
 Initialize this structure using 
 ```julia
-UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64)
-UnitCell( as::Vector{Vector{Float64}} ; localDim::Int64, rank::Int64)
+UnitCell( as::Vector{Vector{Float64}} , localDim::Int64)
+UnitCell( as::Vector{Vector{Float64}} , localDim::Int64, rank::Int64)
 ```
 """
 	mutable struct UnitCell{T}
