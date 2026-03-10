@@ -32,7 +32,7 @@ using Test
         NNdist = 1.0
         AddIsotropicBonds!(UC, NNdist, t1 * SpinVec[4], "t1")
 
-        kSize = 6 * 5 + 3  # small grid for testing
+        kSize = 6 * 6 + 3  # small grid for testing
         bz = BZ([kSize, kSize])
         FillBZ!(bz, UC)
 
@@ -71,7 +71,7 @@ using Test
         NNdist = 1.0
         AddIsotropicBonds!(UC, NNdist, t1 * SpinVec[4], "t1")
 
-        kSize = 6 * 5 + 3
+        kSize = 6 * 6 + 3
         bz = BZ([kSize, kSize])
         FillBZ!(bz, UC)
 
