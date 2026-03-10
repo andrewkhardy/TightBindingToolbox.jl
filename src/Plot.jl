@@ -286,8 +286,8 @@ plot_band_contour!(Ham::Hamiltonian , bz::BZ , band_index::Int64) --> Plots.plot
 Function to draw equal energy contours of the bands in `Hamiltonian`, specifically for the band with the given `band_index`.
 
 """
-    function Plot_Band_Contour(Ham::Hamiltonian , bz::BZ , band_index::Int64 ; cmp::Symbol = :turbo)
-        pyplot()
+    function Plot_Band_Contour!(Ham::Hamiltonian , bz::BZ , band_index::Int64 ; cmp::Symbol = :turbo)
+        gr()
         @assert band_index <= length(Ham.bands[begin]) "Given band does not exist in the given Hamiltonian!"
         @assert length(size(Ham.bands)) == 2 "Contour plots only work for 2d Hamiltonians"
 
@@ -359,8 +359,8 @@ Function to draw the fermi surface at `Efermi` for the given `Hamiltonian` on th
 - `cbar` determines whether to plot the colorbar or not.    
 
 """
-    function Plot_FS(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64} ; cmp::Symbol = :turbo, cbar::Bool=false)
-        pyplot()
+    function Plot_FS!(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64} ; cmp::Symbol = :turbo, cbar::Bool=false)
+        gr()
         @assert length(size(Ham.bands)) == 2 "Fermi surface plots only work for 2d Hamiltonians"
         offsets     =   GetAllOffsets(1, 2)
 

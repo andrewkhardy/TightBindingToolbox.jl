@@ -14,6 +14,12 @@ using Pkg
 Pkg.add("TightBindingToolbox")
 ```
 
+Until the package is registered in the General registry, install via URL:
+```julia
+using Pkg
+Pkg.add(url="https://github.com/andrewkhardy/TightBindingToolbox.jl")
+```
+
 ## Features
 Currently supported :
 * Custom Unit Cell Construction. (v1.3) : now also supports construction in dimensions up to $d=3$. Can change primitives, or expand unit cell on the go.
