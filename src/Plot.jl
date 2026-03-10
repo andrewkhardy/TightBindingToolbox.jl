@@ -1,5 +1,5 @@
 module PlotTB
-    export Plot_UnitCell! ,Plot_Band_Contour!, Plot_Band_Structure!, Plot_FS!, Plot_Fields!, Plot_Lattice!
+    export Plot_UnitCell ,Plot_Band_Contour, Plot_Band_Structure, Plot_FS, Plot_Fields, Plot_Lattice
 
     using LinearAlgebra, LaTeXStrings, Plots
 
@@ -16,7 +16,7 @@ module PlotTB
 
 @doc """
 ```julia
-Plot_UnitCell!(uc::UnitCell ; range::Int64 = 1, bond_cmp::Symbol = :matter, sub_cmp::Symbol = :rainbow, plot_conjugate::Bool=false, plot_labels::Vector{String} = unique(getproperty.(uc.bonds, :label)), plot_arrows::Bool = true, bond_opacity::Float64 = 0.6, site_size::Float64 = 16.0, bond_thickness::Tuple{Float64, Float64} = (4.0, 2.0), bond_rev::Bool=false, plot_lattice::Bool=false)
+Plot_UnitCell(uc::UnitCell ; range::Int64 = 1, bond_cmp::Symbol = :matter, sub_cmp::Symbol = :rainbow, plot_conjugate::Bool=false, plot_labels::Vector{String} = unique(getproperty.(uc.bonds, :label)), plot_arrows::Bool = true, bond_opacity::Float64 = 0.6, site_size::Float64 = 16.0, bond_thickness::Tuple{Float64, Float64} = (4.0, 2.0), bond_rev::Bool=false, plot_lattice::Bool=false)
 ```
 Function to plot the `UnitCell`. 
 - `range` determines the range of UnitCells plotted in real-space. default is ±1.
@@ -31,7 +31,7 @@ Function to plot the `UnitCell`.
 - `plot_lattice`: plot bonds on all sites or only on one unit cell.
 
 """
-    function Plot_UnitCell!(uc::UnitCell ; range::Int64 = 1, bond_cmp::Symbol = :matter, sub_cmp::Symbol = :rainbow, plot_conjugate::Bool=false, plot_labels::Vector{String} = unique(getproperty.(uc.bonds, :label)), plot_arrows::Bool = true, bond_opacity::Float64 = 0.6, site_size::Float64 = 16.0, bond_thickness::Tuple{Float64, Float64} = (4.0, 2.0), bond_rev::Bool=false, plot_lattice::Bool=false)
+    function Plot_UnitCell(uc::UnitCell ; range::Int64 = 1, bond_cmp::Symbol = :matter, sub_cmp::Symbol = :rainbow, plot_conjugate::Bool=false, plot_labels::Vector{String} = unique(getproperty.(uc.bonds, :label)), plot_arrows::Bool = true, bond_opacity::Float64 = 0.6, site_size::Float64 = 16.0, bond_thickness::Tuple{Float64, Float64} = (4.0, 2.0), bond_rev::Bool=false, plot_lattice::Bool=false)
         
         dim         =   length(uc.primitives)
         @assert dim == 2 "Unit Cell plotting only works for 2d right now!"
@@ -141,7 +141,7 @@ Function to plot the `UnitCell`.
     end
 
 
-    function Plot_Lattice!(lat::Lattice{T} ; bond_cmp::Symbol = :matter, sub_cmp::Symbol = :rainbow, plot_labels::Vector{String} = unique(getproperty.(lat.uc.bonds, :label)), plot_arrows::Bool = true, bond_opacity::Float64 = 0.6, site_size::Float64 = 16.0, bond_thickness::Tuple{Float64, Float64} = (4.0, 2.0), bond_rev::Bool=false) where {T}
+    function Plot_Lattice(lat::Lattice{T} ; bond_cmp::Symbol = :matter, sub_cmp::Symbol = :rainbow, plot_labels::Vector{String} = unique(getproperty.(lat.uc.bonds, :label)), plot_arrows::Bool = true, bond_opacity::Float64 = 0.6, site_size::Float64 = 16.0, bond_thickness::Tuple{Float64, Float64} = (4.0, 2.0), bond_rev::Bool=false) where {T}
 
         dim         =   length(lat.uc.primitives)
         @assert dim == 2 "Unit Cell plotting only works for 2d right now!"
@@ -217,7 +217,7 @@ Function to plot the Fields of the UnitCell.
 
 
 """
-    function Plot_Fields!(uc::UnitCell ; OnSiteMatrices::Vector{Matrix{ComplexF64}}=SpinMats((uc.localDim - 1)//2), scale::Float64 = 1.0, range::Int64 = 1, cmp::Symbol = :thermal, field_thickness::Float64 = 1.0, field_opacity::Float64 = 0.6, use_lookup::Bool = false, site_size::Float64 = 12.0)
+    function Plot_Fields(uc::UnitCell ; OnSiteMatrices::Vector{Matrix{ComplexF64}}=SpinMats((uc.localDim - 1)//2), scale::Float64 = 1.0, range::Int64 = 1, cmp::Symbol = :thermal, field_thickness::Float64 = 1.0, field_opacity::Float64 = 0.6, use_lookup::Bool = false, site_size::Float64 = 12.0)
         
         dim         =   length(uc.primitives)
         @assert dim == 2 "Unit Cell plotting only works for 2d right now!"
@@ -311,7 +311,7 @@ Can take in multiple bands into account ∈ `band_index`.
 `labels` are the Plot labels of the critical points.
 
 """
-    function Plot_Band_Structure!(M::T, path::Vector{Vector{Float64}}, band_index::Vector{Int64} = collect(1:length(M.Ham.bands[begin])) ; labels::Vector{} = repeat([""], length(path)), closed::Bool=true, nearest::Bool=true, plot_legend::Bool = true, framestyle::Symbol = :box, guidefontsize::Int64 = 14, tickfontsize::Int64 = 12, font::String = "Helvetica", plot_title::Bool=true) where {T<:Union{Model, BdGModel}}
+    function Plot_Band_Structure(M::T, path::Vector{Vector{Float64}}, band_index::Vector{Int64} = collect(1:length(M.Ham.bands[begin])) ; labels::Vector{} = repeat([""], length(path)), closed::Bool=true, nearest::Bool=true, plot_legend::Bool = true, framestyle::Symbol = :box, guidefontsize::Int64 = 14, tickfontsize::Int64 = 12, font::String = "Helvetica", plot_title::Bool=true) where {T<:Union{Model, BdGModel}}
         
         ##### the k-points taken along the path joining the given points
         bzpath     = CombinedBZPath(M.bz, path ; nearest = nearest, closed = closed)

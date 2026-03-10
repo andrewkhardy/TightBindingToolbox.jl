@@ -119,11 +119,11 @@ The modified Monkhorst grid takes into account the desired boundary condition `B
         elseif dims == 2    ##### 2d BZ
     
             bz.HighSymPoints["M1"]      =    @. 0.5 * bz.basis[1] + 0.0 * bz.basis[2]     ##### The 3 possible M points
-            bz.HighSymPoints["M2"]      =    @. 0.0 * bz.basis[1] + 0.5 * bz.basis[2]
-            bz.HighSymPoints["M3"]      =    @. 0.5 * bz.basis[1] + 0.5 * bz.basis[2]
+            bz.HighSymPoints["X"]      =    @. 0.0 * bz.basis[1] + 0.5 * bz.basis[2]
+            bz.HighSymPoints["M2"]      =    @. 0.5 * bz.basis[1] + 0.5 * bz.basis[2]
             bz.HighSymPoints["-M1"]     =  -(@. 0.5 * bz.basis[1] + 0.0 * bz.basis[2])     ##### The 3 possible M points
-            bz.HighSymPoints["-M2"]     =  -(@. 0.0 * bz.basis[1] + 0.5 * bz.basis[2])
-            bz.HighSymPoints["-M3"]     =  -(@. 0.5 * bz.basis[1] + 0.5 * bz.basis[2])
+            bz.HighSymPoints["-X"]     =  -(@. 0.0 * bz.basis[1] + 0.5 * bz.basis[2])
+            bz.HighSymPoints["-M2"]     =  -(@. 0.5 * bz.basis[1] + 0.5 * bz.basis[2])
     
             if isapprox(VecAngle(bz.basis[1], bz.basis[2]), 2*pi/3, atol=1e-4, rtol=1e-4)   ##### The K points depend on the relative angle of the reciprocal basis.
                 bz.HighSymPoints["K1"]      =   @. (2/3) * bz.basis[1] + (1/3) * bz.basis[2]
