@@ -287,7 +287,7 @@ Function to draw equal energy contours of the bands in `Hamiltonian`, specifical
 
 """
     function Plot_Band_Contour!(Ham::Hamiltonian , bz::BZ , band_index::Int64 ; cmp::Symbol = :turbo)
-        pyplot()
+        gr()
         @assert band_index <= length(Ham.bands[begin]) "Given band does not exist in the given Hamiltonian!"
         @assert length(size(Ham.bands)) == 2 "Contour plots only work for 2d Hamiltonians"
 
@@ -360,7 +360,7 @@ Function to draw the fermi surface at `Efermi` for the given `Hamiltonian` on th
 
 """
     function Plot_FS!(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64} ; cmp::Symbol = :turbo, cbar::Bool=false)
-        pyplot()
+        gr()
         @assert length(size(Ham.bands)) == 2 "Fermi surface plots only work for 2d Hamiltonians"
         offsets     =   GetAllOffsets(1, 2)
 

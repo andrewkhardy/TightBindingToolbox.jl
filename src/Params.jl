@@ -30,14 +30,13 @@ Param( value::Float64 ; rank::Int64 )
         label       ::  String
         dist        ::  Float64
     
-        function Param( value::R ) where {R<:Number}
-            @warn "Rank not passed to Param object. Choosing default value of 2!"
-            return new{2, R}( R[value] , Bond{2}[], "", -1.0 )
-        end
-    
         function Param( value::R ; rank::Int64=2 ) where {R<:Number}
             return new{rank, R}( R[value] , Bond{rank}[], "", -1.0 )
-        end    
+        end
+
+        function Param( value::R, rank::Int64 ) where {R<:Number}
+            return new{rank, R}( R[value] , Bond{rank}[], "", -1.0 )
+        end
     end 
 
 

@@ -103,4 +103,14 @@ include("Plot.jl")
 using .PlotTB
 export Plot_UnitCell! , Plot_Band_Contour!, Plot_Band_Structure!, Plot_FS!, Plot_Fields!, Plot_Lattice!
 
+##### Module for quantum geometric tensor and related metric quantities
+include("Metric.jl")
+using .MetricTB
+export GeoTensor, Curvature, KuboChern, get_metric_measures, hexagon, plot_metric_data
+
+##### Module for spectral response functions
+include("SpectralResponse.jl")
+using .SpecResponse
+export spectral, response
+
 end

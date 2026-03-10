@@ -1,9 +1,26 @@
-using TightBindingToolkit, LinearAlgebra
-using LaTeXStrings, JLD2
-using Plots
-using PyPlot
-pygui(true)
+module MetricTB
 
+using LinearAlgebra
+using LaTeXStrings
+using Plots
+
+using ..TightBindingToolbox.Hams: Hamiltonian, DiagonalizeHamiltonian!, GetVelocity!
+using ..TightBindingToolbox.BZone: BZ
+using ..TightBindingToolbox.Chern: FindLinks, FieldStrength, ChernNumber
+using ..TightBindingToolbox.UCell: UnitCell
+using ..TightBindingToolbox.Parameters: Param, CreateUnitCell!
+using ..TightBindingToolbox.Useful: GetAllOffsets
+
+export GeoTensor, Curvature, KuboChern, get_metric_measures, hexagon, plot_metric_data
+
+@doc """
+```julia
+GeoTensor(Ham::Hamiltonian, subset::Vector{Int64}) --> Array{Matrix{ComplexF64}}
+```
+Computes the quantum geometric tensor for the given `subset` of bands in the `Hamiltonian`.
+The velocity must have been computed first via `GetVelocity!`.
+
+"""
 function GeoTensor(Ham::Hamiltonian, subset::Vector{Int64})
 
     Vx = conj.(permutedims.(Ham.states)) .* Ham.velocity[1] .* Ham.states
@@ -30,10 +47,17 @@ function GeoTensor(Ham::Hamiltonian, subset::Vector{Int64})
 
     end
 
-    return geotensor/length(Ham.bands)
+    return geotensor / length(Ham.bands)
 
 end
 
+@doc """
+```julia
+Curvature(Ham::Hamiltonian, subset::Vector{Int64}) --> Matrix{Float64}
+```
+Computes the Berry curvature for the given `subset` of bands using wavefunction link variables.
+
+"""
 function Curvature(Ham::Hamiltonian, subset::Vector{Int64})::Matrix{Float64}
 
     Links   =   FindLinks(Ham, subset)
@@ -42,6 +66,14 @@ function Curvature(Ham::Hamiltonian, subset::Vector{Int64})::Matrix{Float64}
     return curvature
 end
 
+@doc """
+```julia
+KuboChern(Ham::Hamiltonian, bz::BZ, mu::Float64) --> Float64
+```
+Computes the Chern number using the Kubo formula from velocity matrix elements.
+All bands below `mu` are included in the calculation.
+
+"""
 function KuboChern(Ham::Hamiltonian, bz::BZ, mu::Float64)
 
     Vx = conj.(permutedims.(Ham.states)) .* Ham.velocity[1] .* Ham.states
@@ -74,9 +106,22 @@ function KuboChern(Ham::Hamiltonian, bz::BZ, mu::Float64)
 end
 
 
+@doc """
+```julia
+get_metric_measures(Js, UC, bz, HoppingParams, jhParam, band ; measures=true) --> Dict
+```
+Sweeps over values of `Js`, computing Chern numbers, quantum metric weight, and volume
+for the specified `band` at each value.
+
+"""
 function get_metric_measures(Js::Vector{Float64}, UC::UnitCell, bz::BZ,
-    HoppingParams::Vector{T}, jhParam::Param, band::Int64,
-    filename::String="skyrmion_metric_measures.jld2" ; measures::Bool = true) where {T}
+    HoppingParams::Vector{T}, jhParam::Param, band::Int64 ;
+    measures::Bool = true) where {T}
+
+    # Compute BZ unit area once
+    b1 = [bz.basis[1]; 0.0]
+    b2 = [bz.basis[2]; 0.0]
+    bzUnitArea = abs(cross(b1, b2)[3])
 
     gap_belows    =   Float64[]
     gap_aboves    =   Float64[]
@@ -112,7 +157,7 @@ function get_metric_measures(Js::Vector{Float64}, UC::UnitCell, bz::BZ,
                 chern = ChernNumber(H, [band])
                 push!(Cherns_wfns, chern)
 
-                geo = GeoTensor(H, [band])# #for (i, filling) in enumerate(filling_arr)
+                geo = GeoTensor(H, [band])
                 metric = [real(mat) for mat in geo]
                 berry = [-2*imag(mat) for mat in geo]
                 metric_traces = [tr(mat) for mat in metric]
@@ -136,10 +181,17 @@ function get_metric_measures(Js::Vector{Float64}, UC::UnitCell, bz::BZ,
 
     data = Dict("Js" => Js, "Cherns_wfns" => Cherns_wfns, "Cherns_metric" => Cherns_metric,
         "weights" => weights, "volumes" => volumes, "bandwidths" => bandwidths, "gap_above"=>gap_aboves, "gap_below"=>gap_belows)
-    # save(filename, data)
     return data
 end
 
+@doc """
+```julia
+hexagon(corner::Vector{Float64}) --> Vector{Tuple}
+```
+Returns the edges of a hexagon starting from `corner`, each edge as a tuple of (xs, ys) arrays.
+Useful for drawing hexagonal Brillouin zone boundaries.
+
+"""
 function hexagon(corner::Vector{Float64})
     RotMat = [cos(pi/3) sin(pi/3); -sin(pi/3) cos(pi/3)]
     lines = []
@@ -162,10 +214,25 @@ function hexagon(corner::Vector{Float64})
     return lines
 end
 
-function plot_data(data::Matrix{T},
+@doc """
+```julia
+plot_metric_data(data, kxs, kys, bz ; kwargs...) --> Plots.Plot
+```
+Plots a heatmap of `data` on a hexagonal Brillouin zone using Plots.jl.
+
+Optional keyword arguments:
+- `colorbar_title`: label for the colorbar (default: Berry curvature symbol)
+- `to_save`: tuple `(Bool, String)` — if true, saves to the given filename
+- `labels`: whether to show axis labels
+- `clims`: color limits tuple
+- `cmap`: colormap symbol
+- `annotation`: annotation text
+
+"""
+function plot_metric_data(data::Matrix{T},
     kxs::Vector{Float64}, kys::Vector{Float64},
     bz::BZ;
-    colorbar_title::AbstractString = L"\Omega_n(\mathbf{k})",
+    colorbar_title::AbstractString = L"\\Omega_n(\\mathbf{k})",
     to_save::Tuple{Bool, String} = (false, ""),
     labels::Bool=true,
     clims::Tuple{T, T} = extrema(data),
@@ -192,18 +259,17 @@ function plot_data(data::Matrix{T},
         ylabel!(L"k_y")
         xticks!([0.0], [""])
         yticks!([0.0], [""])
-        # xticks!([-2, -1, 0, 1, 2])
-        # yticks!([-2, -1, 0, 1, 2])
     else
         xticks!([0.0], [""])
         yticks!([0.0], [""])
     end
-    # annotate!()
 
-    inner_hex = hexagon(bz.HighSymPoints["K1"])
-    for edge in inner_hex
-        xs, ys = edge
-        plot!(xs, ys, label = "", lw=2.0, lc=:orange)
+    if hasproperty(bz, :HighSymPoints) && haskey(bz.HighSymPoints, "K1")
+        inner_hex = hexagon(bz.HighSymPoints["K1"])
+        for edge in inner_hex
+            xs, ys = edge
+            plot!(xs, ys, label = "", lw=2.0, lc=:orange)
+        end
     end
 
     annotate!([(1.8, 1.8, text(annotation, "Computer Modern", 12, :black))])
@@ -215,186 +281,4 @@ function plot_data(data::Matrix{T},
     return ssf_plot
 end
 
-
-function pyplot_hexagonal(input::Dict, data::Matrix{T};
-    colorbar_title::AbstractString=L"\Omega_n(\mathbf{k})",
-    cmap::String="Blues", lim::Float64=2.025,
-    annotation::AbstractString="",
-    annotation_position::Tuple{Float64, Float64}=(0.0, 1.0),
-    clims::Tuple{Float64, Float64}=(0.0, 7.0),
-    savename::AbstractString="") where {T}
-
-    PyPlot.cla()
-
-    PyPlot.pcolormesh(input["kxs"], input["kys"], data',
-        cmap=cmap, vmin=clims[1], vmax=clims[2])  # Adjust the size as needed
-
-    PyPlot.colorbar(label=colorbar_title)
-
-    inner_hex = input["inner_hex"]
-    for edge in inner_hex
-        xs, ys = edge
-        PyPlot.plot(xs, ys, linewidth=2.0, c=:orange)
-    end
-
-    PyPlot.gca().set_aspect("equal")
-    PyPlot.gca().set_xticks([])
-    PyPlot.gca().set_yticks([])
-    PyPlot.annotate(annotation, annotation_position, xycoords="axes fraction")
-    PyPlot.gca().set_xlim(-lim, lim)
-    PyPlot.gca().set_ylim(-lim, lim)
-    PyPlot.gca().set_xlabel(L"k_x")
-    PyPlot.gca().set_ylabel(L"k_y")
-
-    if !isempty(savename)
-        PyPlot.savefig(savename, bbox_inches="tight")
-    end
-
-
-end
-
-
-##Triangular Lattice
-# params = Dict()
-# SkXSize = get!(params, "SkXSize", 2)
-# SkX = get!(params, "SkX", "Bloch")
-# SkX = "Bloch"
-# a1 = SkXSize / 2 * [-3.0, sqrt(3)]
-# a2 = SkXSize / 2 * [3.0, sqrt(3)]
-# l1 = [1.0, 0]
-# l2 = [-0.5, sqrt(3) / 2]
-# UC = UnitCell([a1, a2], 2, 2)
-# ##Parameters
-
-# t = get!(params, "t", 1.0)
-# jh = get!(params, "jh", 4.0)
-# U = get!(params, "U", 0.0)
-# ##### Thermodynamic parameters
-# filling = get!(params, "filling", 12.5/24)
-# T = get!(params, "T", 0.0)
-# t1 = -t
-# t1Param = Param(t1, 2)
-# jhParam = Param(jh, 2)
-# HoppingParams = [t1Param, jhParam]
-# su2spin = SpinMats(1 // 2)
-
-# ##Adding inner-hexagon structure
-# for j = 0:(SkXSize-1)
-#     for i = 0:(SkXSize*3-1)
-#         AddBasisSite!(UC, i .* l1 + j .* l2)
-#     end
-# end
-# AddIsotropicBonds!(t1Param, UC, 1.0, su2spin[4], "t1", checkOffsetRange=1)
-# ##Functions that will be useful for adding anisotropic bonds
-# weiss_neel(v) = [sin(pi * (norm(v) / (SkXSize))) * v[1] / norm(v), sin(pi * (norm(v) / (SkXSize))) * v[2] / norm(v), cos(pi * (norm(v) / (SkXSize)))]
-# weiss_bloch(v) = [sin(pi * (norm(v) / (SkXSize))) * v[2] / norm(v), sin(pi * (norm(v) / (SkXSize))) * -v[1] / norm(v), cos(pi * (norm(v) / (SkXSize)))]
-# weiss = Dict("Neel" => weiss_neel, "Bloch" => weiss_bloch)
-# sigmav(i, j) = 2 .* [su2spin[1][i, j], su2spin[2][i, j], su2spin[3][i, j]]
-# s11 = sigmav(1, 1)
-# s12 = sigmav(1, 2)
-# s21 = sigmav(2, 1)
-# s22 = sigmav(2, 2)
-
-# intermat(s) = [dot(s, s11) dot(s, s12); dot(s, s21) dot(s, s22)]
-
-
-# ##Adding anisotropic bonds and normalizing if needed
-# for (ind, bas) in enumerate(UC.basis)
-#     closest = [bas, bas - a1, bas - a2, bas - a1 - a2, bas + a1, bas + a2, bas + a1 + a2, bas + a1 - a2, bas - a1 + a2]
-#     minimal = findmin(x -> norm(x), closest)[2]
-#     if (SkXSize - 1) < norm(closest[minimal]) < SkXSize
-#         mat = intermat(normalize(weiss[SkX](closest[minimal]) + weiss[SkX](-closest[minimal])))
-#     else
-#         spn = weiss[SkX](closest[minimal])
-#         replace!(spn, NaN => 0.0)
-#         mat = intermat(normalize(spn))
-#     end
-#     AddAnisotropicBond!(jhParam, UC, ind, ind, [0, 0], mat, 0.0, "Hunds")
-# end
-# CreateUnitCell!(UC, HoppingParams)
-
-
-# ##Creating BZ and Hamiltonian Model
-# n = 50
-# kSize = 6 * n + 3
-# bz = BZ(kSize)
-# FillBZ!(bz, UC)
-
-# b1 = [bz.basis[1]; 0.0]
-# b2 = [bz.basis[2]; 0.0]
-# bzUnitArea = abs(cross(b1, b2)[3])
-
-# H = Hamiltonian(UC, bz)
-# DiagonalizeHamiltonian!(H)
-# GetVelocity!(H, bz)
-
-# Mdl = Model(UC, bz, H; filling=filling)
-# # SolveModel!(Mdl; get_gap=true)
-
-# kxs = collect(LinRange(-2, 2, 101))
-# kys = collect(LinRange(-2, 2, 101))
-# ks = [[kx, ky] for kx in kxs, ky in kys]
-# indices = GetQIndex.(ks, Ref(bz) ; nearest=true)
-# indices = Tuple.(indices)
-# indices = CartesianIndex.(indices)
-
-
-# band = 13
-# geo = GeoTensor(H, [band])
-
-# metric = [real(mat) for mat in geo]
-# berry = [-2*imag(mat) for mat in geo]
-# berry_curvature = [mat[1, 2] for mat in berry]
-# metric_traces = [tr(mat) for mat in metric]
-# metric_sqrtDets = [sqrt(abs(det(mat))) for mat in metric]
-
-# curvature = Curvature(H, [band])
-# curvature = curvature * prod(bz.gridSize)/bzUnitArea
-
-# berry_curvature = berry_curvature * prod(bz.gridSize)
-# metric_traces = metric_traces * prod(bz.gridSize)
-# metric_sqrtDets = metric_sqrtDets * prod(bz.gridSize)
-
-# dA = bzUnitArea / (2*pi*prod(bz.gridSize))
-
-# weight = sum(metric_traces) * dA
-# volume = sum(metric_sqrtDets) * dA
-# chern = sum(berry_curvature) * dA
-# chern_wfn = sum(curvature) * dA
-
-# inner_hex = hexagon(bz.HighSymPoints["K1"])
-# save("J=$(jh)_band=$(band)_metric.jld2",
-#     Dict("metric"=>metric,
-#         "berry"=>berry[indices],
-#         "curvature"=>curvature[indices],
-#         "metric_traces"=>metric_traces[indices],
-#         "metric_sqrtDets"=>metric_sqrtDets[indices],
-#         "berry_curvature"=>berry_curvature[indices],
-#         "weight"=>weight,
-#         "volume"=>volume,
-#         "chern"=>chern,
-#         "chern_wfn"=>chern_wfn,
-#         "inner_hex"=>inner_hex,
-#         "bzUnitArea"=>bzUnitArea,
-#         "dA"=>dA,
-#         "band"=>band,
-#         "kxs" => kxs,
-#         "kys" => kys,
-#         "indices" => indices,
-#         ))
-
-
-input = load("/home/anjishnubose/Research/Repos/skyrmion_bilayer/CQIQC-Research/J=4.0_band=1_metric.jld2")
-
-data = abs.(input["curvature"])
-pyplot_hexagonal(input, data, cmap="Blues", clims=(0.0, 7.0), savename="")
-
-# berry_plot = plot_data(abs.(curvature[indices]), kxs, kys, bz ;
-#     clims=(0.0, 18.0), annotation="(a)")
-# volume_plot = plot_data(metric_sqrtDets[indices] , kxs, kys, bz ;
-#     clims=(0.0, 12.0), cmap=:algae, colorbar_title=L"V_{n}(\mathbf{k})",
-#     annotation="(b)")
-
-# p =plot(berry_plot, volume_plot, layout=grid(2, 1), size=(400, 600))
-
-# pNormal(x, mu, sigma) = 1/(sigma*sqrt(2*pi)) * exp(-0.5*((x-mu)/sigma)^2)
+end # module MetricTB
