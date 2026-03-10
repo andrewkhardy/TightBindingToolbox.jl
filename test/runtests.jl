@@ -63,7 +63,7 @@ using Test
     @testset "Model at half-filling" begin
         a1 = [1.0, 0.0]
         a2 = [0.0, 1.0]
-        UC = UnitCell([a1, a2], 1, 2)
+        UC = UnitCell([a1, a2], 2, 2)
         AddBasisSite!(UC, [0.0, 0.0])
 
         SpinVec = SpinMats(1//2)
