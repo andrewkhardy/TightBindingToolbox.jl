@@ -1,5 +1,5 @@
 module PlotTB
-    export Plot_UnitCell ,Plot_Band_Contour, Plot_Band_Structure, Plot_FS, Plot_Fields, Plot_Lattice
+    export Plot_UnitCell, Plot_Band_Contour!, Plot_Band_Structure, Plot_FS!, Plot_Fields, Plot_Lattice
 
     using LinearAlgebra, LaTeXStrings, Plots
 

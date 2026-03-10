@@ -7,6 +7,7 @@ makedocs(
     modules     =   [TightBindingToolbox, TightBindingToolbox.UCell, TightBindingToolbox.DesignUCell, TightBindingToolbox.ExpandUCell, TightBindingToolbox.Parameters, TightBindingToolbox.LatticeStruct, TightBindingToolbox.DesignLattice, TightBindingToolbox.BZone, TightBindingToolbox.Hams, TightBindingToolbox.TBModel, TightBindingToolbox.Chern, TightBindingToolbox.suscep, TightBindingToolbox.conduct]   ,
     pages = [
         "Introduction"              =>  "index.md",
+        "Utilities"                 =>  "Utilities.md",
         "Unit Cell"                 =>  "UnitCell.md",
         "Parameters"                =>  "Params.md",
         "Lattice"                   =>  "Lattice.md",
