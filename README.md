@@ -56,4 +56,4 @@ Currently supported :
 * Real-sapce lattice construction with arbitrary boundary condition. (v2.1)
 
 ## Documentation
-For more details, please see [Documentation](https://andrewkhardy.github.io/TightBindingToolbox.jl/dev/)
+For more details, please see [Documentation](https://Toronto-Condensed-Matter-Theory.github.io/TightBindingToolbox.jl/dev/)
