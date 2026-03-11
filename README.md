@@ -1,6 +1,6 @@
 # TightBindingToolbox
 
-[![Build Status](https://https://github.com/Toronto-Condensed-Matter-TheoryTightBindingToolbox.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://https://github.com/Toronto-Condensed-Matter-TheoryTightBindingToolbox.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://https://github.com/Toronto-Condensed-Matter-Theory/TightBindingToolbox.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://https://github.com/Toronto-Condensed-Matter-Theory/TightBindingToolbox.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 TightBindingToolbox.jl is a Julia package meant for constructing, and obtaining useful properties of generic tight-binding models. It supports any lattice structure, with any user-defined bonds on that lattice. It also has support for any spin of the particle hopping on the lattice. It is an updated version of the [TightBindingToolkit.jl](https://github.com/Anjishnubose/TightBindingToolkit.jl)
 ## Install
