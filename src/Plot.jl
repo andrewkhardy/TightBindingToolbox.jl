@@ -1,5 +1,5 @@
 module PlotTB
-    export Plot_UnitCell, Plot_Band_Contour!, Plot_Band_Structure, Plot_FS!, Plot_Fields, Plot_Lattice
+    export Plot_UnitCell, Plot_Band_Contour, Plot_Band_Structure, Plot_FS, Plot_Fields, Plot_Lattice
 
     using LinearAlgebra, LaTeXStrings, Plots
 
@@ -286,7 +286,7 @@ plot_band_contour!(Ham::Hamiltonian , bz::BZ , band_index::Int64) --> Plots.plot
 Function to draw equal energy contours of the bands in `Hamiltonian`, specifically for the band with the given `band_index`.
 
 """
-    function Plot_Band_Contour!(Ham::Hamiltonian , bz::BZ , band_index::Int64 ; cmp::Symbol = :turbo)
+    function Plot_Band_Contour(Ham::Hamiltonian , bz::BZ , band_index::Int64 ; cmp::Symbol = :turbo)
         gr()
         @assert band_index <= length(Ham.bands[begin]) "Given band does not exist in the given Hamiltonian!"
         @assert length(size(Ham.bands)) == 2 "Contour plots only work for 2d Hamiltonians"
@@ -304,7 +304,7 @@ Function to draw equal energy contours of the bands in `Hamiltonian`, specifical
 
 @doc """
 ```julia
-plot_band_structure!(M<:Union{Model, BdGModel}, path::Vector{Vector{Float64}},  band_index::Vector{Int64} = collect(1:length(M.Ham.bands[begin])) ; labels::Vector{} = repeat([""], length(path)), closed::Bool=true, nearest::Bool=true) --> Plots.plot()
+plot_band_structure(M<:Union{Model, BdGModel}, path::Vector{Vector{Float64}},  band_index::Vector{Int64} = collect(1:length(M.Ham.bands[begin])) ; labels::Vector{} = repeat([""], length(path)), closed::Bool=true, nearest::Bool=true) --> Plots.plot()
 ```
 Function to plot band structures of the `Model` along a `path` in the BZ determined by the given critical points.
 Can take in multiple bands into account ∈ `band_index`.
@@ -351,7 +351,7 @@ Can take in multiple bands into account ∈ `band_index`.
 
 @doc """
 ```julia
-plot_FS!(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64})--> Plots.plot()
+plot_FS(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64})--> Plots.plot()
 ```
 Function to draw the fermi surface at `Efermi` for the given `Hamiltonian` on the given `BZ`. 
 
@@ -359,7 +359,7 @@ Function to draw the fermi surface at `Efermi` for the given `Hamiltonian` on th
 - `cbar` determines whether to plot the colorbar or not.    
 
 """
-    function Plot_FS!(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64} ; cmp::Symbol = :turbo, cbar::Bool=false)
+    function Plot_FS(Ham::Hamiltonian , bz::BZ , Efermi::Vector{Float64} , band_index::Vector{Int64} ; cmp::Symbol = :turbo, cbar::Bool=false)
         gr()
         @assert length(size(Ham.bands)) == 2 "Fermi surface plots only work for 2d Hamiltonians"
         offsets     =   GetAllOffsets(1, 2)
